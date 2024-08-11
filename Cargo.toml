@@ -5,5 +5,15 @@ edition = "2021"
 rust-version = "1.80.0"
 
 [dependencies]
-glfw = "0.58.0"
+# Tracing dependency allows us to instrument dr-engine and provide structured logging.
+# Implementations with formatters must be provided by any consumer.
 tracing = "0.1.40"
+
+# Vulkania provides Vulkan bindings for rust.
+vulkanalia = { version = "=0.24.0", features = ["libloading", "provisional", "window"] }
+
+# winit is a cross-platform window creation and management framework for rust. Supports {WIN/MACOS/LINUX/ANDROID/IOS}.
+winit = "0.30.5"
+
+# A linear algebra and mathematics library for computer graphics, providing support for Vectors, Matricies, Quaternions, and others.
+cgmath = "0.18.0"

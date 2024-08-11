@@ -1,4 +1,6 @@
 mod definition;
+mod project;
+mod slice;
 
 pub use crate::application::definition::Definition;
 use crate::window;
@@ -17,10 +19,8 @@ impl Application {
     }
 
     pub fn run(&self) {
-        let window = Window {
-            definition: window::Definition::build(self.application_definition.title.clone(), self.application_definition.width, self.application_definition.height)
-        };
-
+        let window_definition = window::definition::Definition::new(self.application_definition.title.clone(), self.application_definition.width, self.application_definition.height);
+        let window = Window::new(window_definition);
         window.run()
     }
 }
