@@ -1,25 +1,32 @@
+use std::fmt::Debug;
 use tracing::trace;
 use winit::application::ApplicationHandler;
 use winit::event::{DeviceEvent, DeviceId, WindowEvent};
 use winit::event_loop::ActiveEventLoop;
-use winit::window::WindowId;
-use crate::window::platform::winit::MyUserEvent;
-use crate::window::Window;
+use winit::window::{Window, WindowId};
+use crate::window::platform::winit::EventHandler;
 
-pub (crate) struct State {
+#[derive(Debug)]
+pub(in crate::window::platform) struct MyUserEvent;
 
+pub(in crate::window::platform) struct State {
+    callback_handler: Box<dyn EventHandler>,
+    window: Window
 }
 
 impl State {
-    pub fn new() -> Self {
-        Self { }
+    pub(in crate::window::platform) fn new(
+        window: Window,
+        callback_handler: Box<dyn EventHandler>
+    ) -> Self {
+        Self { callback_handler, window }
     }
 }
 
 impl ApplicationHandler<MyUserEvent> for State {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         trace!("Resumed");
-        //self.window.resume();
+        self.callback_handler.resume();
     }
 
     fn user_event(&mut self, event_loop: &ActiveEventLoop, user_event: MyUserEvent) {
@@ -35,11 +42,11 @@ impl ApplicationHandler<MyUserEvent> for State {
         match event {
             WindowEvent::CloseRequested => {
                 trace!("Close Requested");
-                //self.window.destroy();
+                self.callback_handler.destroy();
                 event_loop.exit();
             },
             WindowEvent::RedrawRequested => {
-                //self.window.render();
+                self.callback_handler.render();
             },
             _ => ()
         }
@@ -50,6 +57,6 @@ impl ApplicationHandler<MyUserEvent> for State {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
-
+        self.window.request_redraw()
     }
 }

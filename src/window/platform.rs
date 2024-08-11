@@ -1,2 +1,2 @@
-pub(crate) mod winit;
 mod state;
+pub(crate) mod winit;

@@ -1,18 +1,33 @@
 use winit::dpi::{LogicalSize, Size};
 use winit::event_loop::{ControlFlow, EventLoop};
+use winit::raw_window_handle::HasWindowHandle;
 use winit::window::Window;
-use crate::window::platform::state::State;
+use crate::window::platform::state::{MyUserEvent, State};
 
-#[derive(Debug)]
-pub(crate) struct MyUserEvent;
-
-#[derive(Debug)]
 pub(crate) struct WinitWindow {
-    window: Window
+    event_loop: EventLoop<MyUserEvent>,
+    window: Window,
+    callback_handler: Option<Box<dyn EventHandler + 'static>>
+}
+
+pub trait EventHandler {
+    fn resume(&self);
+    fn render(&self);
+    fn destroy(&self);
 }
 
 impl WinitWindow {
-    pub(crate) fn new(title: String, width: u32, height: u32) -> Self {
+    pub(crate) fn get_window_handle_provider(&self) -> &dyn HasWindowHandle {
+        &self.window
+    }
+}
+
+impl WinitWindow {
+    pub(crate) fn new(
+        title: String,
+        width: u32,
+        height: u32
+    ) -> Self {
         let event_loop = EventLoop::<MyUserEvent>::with_user_event().build().unwrap();
         event_loop.set_control_flow(ControlFlow::Poll);
 
@@ -23,18 +38,16 @@ impl WinitWindow {
         #[allow(deprecated)]
         let window = event_loop.create_window(window_attributes).unwrap();
 
-        let mut state = State::new();
-        event_loop.run_app(&mut state).unwrap();
-
-        Self {
-            window
-        }
+        Self { event_loop, window, callback_handler: None }
     }
 
-    pub(crate) fn run(&self, window: &crate::window::Window) {
-        /*
-        let mut state = State::new(render_window);
-        let _ = self.event_loop.run_app(&mut state).unwrap();
-         */
+    pub(crate) fn attach_handler(&mut self, callback_handler: impl EventHandler + 'static) {
+        self.callback_handler = Some(Box::new(callback_handler))
+    }
+
+    pub(crate) fn run(self) {
+        let callback_handler = self.callback_handler.unwrap();
+        let mut state = State::new(self.window, callback_handler);
+        self.event_loop.run_app(&mut state).unwrap();
     }
 }
