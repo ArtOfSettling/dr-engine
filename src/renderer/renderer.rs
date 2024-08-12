@@ -1,5 +1,4 @@
-use winit::raw_window_handle::HasWindowHandle;
-use crate::renderer::platform::vulkan_renderer::VulkanRenderer;
+use crate::platform::PlatformRenderer;
 use crate::renderer::definition::Definition;
 
 pub(crate) struct Renderer {
@@ -7,7 +6,7 @@ pub(crate) struct Renderer {
 
     // for now, no hidden abstraction for this, it simply holds a vulkan renderer and does not expose
     // it outside of this crate. Potential extension point in the future for other renderers.
-    platform_renderer: Option<VulkanRenderer>
+    platform_renderer: Option<Box<dyn PlatformRenderer>>
 }
 
 impl Renderer {
@@ -18,11 +17,11 @@ impl Renderer {
         }
     }
 
-    pub(crate) fn attach_window_handle_provider(
+    pub(crate) fn set_platform_renderer(
         &mut self,
-        window_handle_provider: &dyn HasWindowHandle
+        platform_renderer: Box<dyn PlatformRenderer>
     ) {
-        self.platform_renderer = Some(VulkanRenderer::new(window_handle_provider))
+        self.platform_renderer = Some(platform_renderer)
     }
 
     pub(crate) fn resume(&self) {

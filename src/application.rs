@@ -2,20 +2,20 @@ mod definition;
 mod project;
 mod slice;
 
-use std::ops::Deref;
 pub use crate::application::definition::Definition;
 use crate::renderer::renderer::Renderer;
 use crate::{renderer, window};
+use crate::module::default_module::DefaultModule;
+use crate::module::Module;
 use crate::window::platform::winit::EventHandler;
-pub use crate::window::Window;
+use crate::window::Window;
 
-#[derive(Debug)]
 pub struct Application {
-    application_definition: Definition
+    application_definition: Definition,
+    module: Box<dyn Module>
 }
 
-
-pub struct WindowEventHandler {
+pub(crate) struct WindowEventHandler {
     pub(crate) renderer: Renderer
 }
 
@@ -34,8 +34,22 @@ impl EventHandler for WindowEventHandler {
 }
 
 impl Application {
-    pub fn new(application_definition: Definition) -> Self {
-        Application { application_definition }
+    pub fn default() -> Self {
+        Application {
+            application_definition: Definition::default(),
+            module: DefaultModule::default()
+        }
+    }
+
+    pub fn new(application_definition: Definition, module: Box<dyn Module>) -> Self {
+        Application { application_definition, module }
+    }
+
+    pub fn with_application_definition(application_definition: Definition) -> Self {
+        Application {
+            application_definition,
+            module: DefaultModule::default()
+        }
     }
 
     pub fn run(&self) {
@@ -51,7 +65,10 @@ impl Application {
         let mut window = Window::new(window_definition);
         let mut handler = WindowEventHandler { renderer };
 
-        handler.renderer.attach_window_handle_provider(window.get_window_handle_provider());
+        let platform_renderer = self.module.get_platform_renderer(
+            window.get_window_handle_provider()
+        );
+        handler.renderer.set_platform_renderer(platform_renderer);
         window.attach_handler(handler);
         window.run()
     }

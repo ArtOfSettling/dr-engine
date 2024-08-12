@@ -7,13 +7,14 @@ use vulkanalia::loader::{LibloadingLoader, LIBRARY};
 use vulkanalia::vk::{DebugUtilsMessengerEXT, DeviceV1_0, EntryV1_0, ExtDebugUtilsExtension, HasBuilder, InstanceV1_0, PhysicalDevice, Queue};
 use vulkanalia::window as vk_window;
 use winit::raw_window_handle::HasWindowHandle;
+use crate::platform::PlatformRenderer;
 
 const PORTABILITY_MACOS_VERSION: Version = Version::new(1, 3, 216);
 const VALIDATION_ENABLED: bool = cfg!(debug_assertions);
 const VALIDATION_LAYER: vk::ExtensionName =
     vk::ExtensionName::from_bytes(b"VK_LAYER_KHRONOS_validation");
 
-pub (in crate::renderer) struct VulkanRenderer {
+pub (crate) struct VulkanRenderer {
     entry: Entry,
     instance: Instance,
     physical_device: PhysicalDevice,
@@ -23,21 +24,23 @@ pub (in crate::renderer) struct VulkanRenderer {
 }
 
 impl VulkanRenderer {
-    pub (in crate::renderer) fn new(window_handle_provider: &dyn HasWindowHandle) -> Self {
+    pub(crate) fn new(window_handle_provider: &dyn HasWindowHandle) -> Self {
         unsafe {
             initialize_vulkan(window_handle_provider)
         }
     }
+}
 
-    pub (in crate::renderer) fn resume(&self) {
+impl PlatformRenderer for VulkanRenderer {
+    fn resume(&self) {
         trace!("Resume");
     }
 
-    pub (in crate::renderer) fn render(&self) {
+    fn render(&self) {
         trace!("Render");
     }
 
-    pub (in crate::renderer) fn destroy(&self) {
+    fn destroy(&self) {
         trace!("Destroy");
         unsafe { self.logical_device.destroy_device(None) }
         unsafe { if VALIDATION_ENABLED { self.instance.destroy_debug_utils_messenger_ext(self.messenger.unwrap(), None); } }
