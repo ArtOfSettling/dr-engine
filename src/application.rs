@@ -6,13 +6,31 @@ use std::ops::Deref;
 pub use crate::application::definition::Definition;
 use crate::renderer::renderer::Renderer;
 use crate::{renderer, window};
-use crate::window::event_handler::WindowEventHandler;
 use crate::window::platform::winit::EventHandler;
 pub use crate::window::Window;
 
 #[derive(Debug)]
 pub struct Application {
     application_definition: Definition
+}
+
+
+pub struct WindowEventHandler {
+    pub(crate) renderer: Renderer
+}
+
+impl EventHandler for WindowEventHandler {
+    fn resume(&self) {
+        self.renderer.resume();
+    }
+
+    fn render(&self) {
+        self.renderer.render();
+    }
+
+    fn destroy(&self) {
+        self.renderer.destroy();
+    }
 }
 
 impl Application {

@@ -2,18 +2,13 @@ use winit::dpi::{LogicalSize, Size};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::raw_window_handle::HasWindowHandle;
 use winit::window::Window;
+pub use crate::window::event_handler::EventHandler;
 use crate::window::platform::state::{MyUserEvent, State};
 
 pub(crate) struct WinitWindow {
     event_loop: EventLoop<MyUserEvent>,
     window: Window,
     callback_handler: Option<Box<dyn EventHandler + 'static>>
-}
-
-pub trait EventHandler {
-    fn resume(&self);
-    fn render(&self);
-    fn destroy(&self);
 }
 
 impl WinitWindow {
