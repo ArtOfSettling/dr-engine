@@ -1,4 +1,3 @@
-use tracing::{info, trace};
 use winit::raw_window_handle::HasWindowHandle;
 use crate::renderer::platform::vulkan_renderer::VulkanRenderer;
 use crate::renderer::definition::Definition;
@@ -27,14 +26,20 @@ impl Renderer {
     }
 
     pub(crate) fn resume(&self) {
-        trace!("Renderer Resume");
+        if let Some(platform_renderer) = &self.platform_renderer {
+            platform_renderer.resume()
+        }
     }
 
     pub(crate) fn render(&self) {
-        trace!("Renderer Render");
+        if let Some(platform_renderer) = &self.platform_renderer {
+            platform_renderer.render()
+        }
     }
 
     pub(crate) fn destroy(&self) {
-        trace!("Renderer Destroy");
+        if let Some(platform_renderer) = &self.platform_renderer {
+            platform_renderer.destroy()
+        }
     }
 }
