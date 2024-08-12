@@ -4,6 +4,7 @@ use crate::window::platform::winit::{EventHandler, WinitWindow};
 
 pub(crate) mod definition;
 pub(crate) mod platform;
+pub(crate) mod event_handler;
 
 pub struct Window {
     pub window_definition: Definition,

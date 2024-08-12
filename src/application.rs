@@ -3,43 +3,12 @@ mod project;
 mod slice;
 
 use std::ops::Deref;
-use std::rc::Rc;
-use tracing::trace;
 pub use crate::application::definition::Definition;
 use crate::renderer::renderer::Renderer;
 use crate::{renderer, window};
+use crate::window::event_handler::WindowEventHandler;
 use crate::window::platform::winit::EventHandler;
 pub use crate::window::Window;
-
-
-
-
-
-struct WindowEventHandler {
-    renderer: Renderer
-}
-
-impl EventHandler for WindowEventHandler {
-    fn resume(&self) {
-        trace!("Event Handler Resume");
-        self.renderer.resume();
-    }
-
-    fn render(&self) {
-        trace!("Event Handler Render");
-        self.renderer.render();
-    }
-
-    fn destroy(&self) {
-        trace!("Event Handler Destroy");
-        self.renderer.destroy();
-    }
-}
-
-
-
-
-
 
 #[derive(Debug)]
 pub struct Application {
